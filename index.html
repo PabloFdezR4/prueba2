@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Restaurador de fotos · Nano Banana 2 · 1K barato</title>
+  <style>
+    :root {
+      --bg: #0b0d12;
+      --panel: rgba(255,255,255,0.05);
+      --panel2: rgba(255,255,255,0.07);
+      --line: rgba(255,255,255,0.10);
+      --line2: rgba(255,255,255,0.16);
+      --text: #f4f6fb;
+      --muted: #a3adbf;
+      --ok: #92f2ba;
+      --warn: #ffd58d;
+      --danger: #ffabab;
+      --shadow: 0 24px 70px rgba(0,0,0,0.35);
+      --radius-xl: 28px;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background:
+        radial-gradient(circle at top left, rgba(255,255,255,0.08), transparent 28%),
+        radial-gradient(circle at top right, rgba(80,120,255,0.10), transparent 20%),
+        linear-gradient(180deg, #12151d 0%, #090a0f 100%);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body { padding: 18px; }
+
+    .app {
+      width: min(1280px, 100%);
+      margin: 0 auto;
+      display: grid;
+      gap: 18px;
+    }
+
+    .hero, .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+      backdrop-filter: blur(14px);
+      box-shadow: var(--shadow);
+    }
+
+    .hero { padding: 26px; display: grid; gap: 14px; }
+    .card { padding: 18px; }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.06);
+      color: #dfe8f7;
+      font-size: 12px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(28px, 4vw, 52px);
+      line-height: 1.02;
+      letter-spacing: -0.03em;
+    }
+
+    p { margin: 0; color: var(--muted); line-height: 1.65; }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(320px, 390px);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .stack { display: grid; gap: 18px; }
+
+    .dropzone {
+      min-height: 260px;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      border: 1px dashed rgba(255,255,255,0.18);
+      border-radius: 24px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+      cursor: pointer;
+      text-align: center;
+      transition: .16s ease;
+    }
+
+    .dropzone.dragover {
+      border-color: rgba(255,255,255,0.34);
+      background: linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.04));
+    }
+
+    .dropzone-inner {
+      max-width: 520px;
+      display: grid;
+      gap: 12px;
+      justify-items: center;
+    }
+
+    .dropzone-icon {
+      width: 68px;
+      height: 68px;
+      border-radius: 22px;
+      display: grid;
+      place-items: center;
+      font-size: 30px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid var(--line);
+    }
+
+    .native-file-input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      border: 0;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      clip-path: inset(50%);
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .picker-btn,
+    .mobile-viewer-btn,
+    .viewer-close-btn {
+      appearance: none;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.08);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 12px 16px;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform .16s ease, opacity .16s ease, background .16s ease;
+      text-decoration: none;
+    }
+
+    .picker-btn:hover,
+    .mobile-viewer-btn:hover,
+    .viewer-close-btn:hover {
+      transform: translateY(-1px);
+      background: rgba(255,255,255,0.12);
+    }
+
+
+    .selected-file-card {
+      display: grid;
+      grid-template-columns: 76px minmax(0, 1fr);
+      gap: 12px;
+      align-items: center;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255,255,255,0.04);
+    }
+
+    .selected-file-card img {
+      width: 76px;
+      height: 76px;
+      object-fit: cover;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.06);
+      display: block;
+    }
+
+    .selected-file-meta {
+      min-width: 0;
+      display: grid;
+      gap: 4px;
+    }
+
+    .selected-file-title {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .selected-file-name {
+      font-size: 15px;
+      font-weight: 800;
+      line-height: 1.3;
+      word-break: break-word;
+    }
+
+    .selected-file-info {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .mobile-only { display: none; }
+
+    .mobile-viewer {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      background: rgba(5,7,11,0.94);
+      backdrop-filter: blur(12px);
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .mobile-viewer-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .mobile-viewer-help {
+      color: var(--muted);
+      font-size: 13px;
+      text-align: right;
+    }
+
+    .mobile-compare-shell {
+      --divider: 50%;
+      position: relative;
+      flex: 1;
+      min-height: 0;
+      width: 100%;
+      overflow: hidden;
+      border-radius: 24px;
+      border: 1px solid var(--line);
+      background: #07090d;
+      touch-action: none;
+      overscroll-behavior: contain;
+      user-select: none;
+    }
+
+    body.no-scroll {
+      overflow: hidden;
+      touch-action: none;
+    }
+
+
+    .preview-wrap { display: grid; gap: 14px; }
+    .preview-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: end;
+      flex-wrap: wrap;
+    }
+
+    .preview-top h2 {
+      margin: 0 0 4px;
+      font-size: clamp(20px, 2vw, 28px);
+      line-height: 1.1;
+    }
+
+    .compare-shell {
+      --divider: 50%;
+      position: relative;
+      overflow: hidden;
+      border-radius: 26px;
+      border: 1px solid var(--line);
+      background: #07090d;
+      user-select: none;
+      touch-action: none;
+      overscroll-behavior: contain;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+    }
+
+    .compare-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      min-height: 320px;
+      display: grid;
+      place-items: center;
+    }
+
+    .compare-img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: center;
+      pointer-events: none;
+      display: block;
+      background: #0a0c10;
+    }
+
+    .compare-after {
+      clip-path: inset(0 calc(100% - var(--divider)) 0 0);
+    }
+
+    .compare-pending {
+      filter: blur(14px) saturate(0.92) brightness(0.92);
+      transform: scale(1.02);
+      opacity: 0.96;
+    }
+
+    .compare-divider {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: calc(var(--divider) - 1px);
+      width: 2px;
+      background: rgba(255,255,255,0.95);
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.15);
+      z-index: 5;
+      pointer-events: none;
+    }
+
+    .compare-handle {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 58px;
+      height: 58px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: rgba(25,27,34,0.9);
+      border: 1px solid rgba(255,255,255,0.16);
+      color: white;
+      font-size: 22px;
+      backdrop-filter: blur(12px);
+    }
+
+    .badge {
+      position: absolute;
+      top: 14px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(22,24,31,0.74);
+      border: 1px solid rgba(255,255,255,0.08);
+      font-size: 12px;
+      font-weight: 700;
+      z-index: 6;
+    }
+    .badge.left { left: 14px; }
+    .badge.right { right: 14px; }
+
+    .field { display: grid; gap: 8px; }
+    .field label {
+      font-size: 13px;
+      font-weight: 700;
+      color: #dce4f2;
+    }
+
+    input[type="text"], textarea, select {
+      width: 100%;
+      border-radius: 14px;
+      border: 1px solid var(--line2);
+      background: rgba(0,0,0,0.28);
+      color: var(--text);
+      padding: 14px;
+      font: inherit;
+      outline: none;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      border-color: rgba(255,255,255,0.28);
+      box-shadow: 0 0 0 3px rgba(255,255,255,0.06);
+    }
+
+    textarea { min-height: 190px; resize: vertical; line-height: 1.5; }
+
+    .subtle {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; }
+
+    button {
+      appearance: none;
+      border: 0;
+      border-radius: 16px;
+      padding: 14px 16px;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform .16s ease, opacity .16s ease, background .16s ease;
+    }
+
+    button:hover { transform: translateY(-1px); }
+    button:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+    .primary { background: #fff; color: #0c0e13; }
+    .secondary { background: rgba(255,255,255,0.07); color: var(--text); border: 1px solid var(--line); }
+    .ghost { background: rgba(0,0,0,0.22); color: var(--text); border: 1px solid var(--line); }
+
+    .status {
+      border-radius: 16px;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      font-size: 14px;
+      line-height: 1.6;
+      background: rgba(255,255,255,0.04);
+    }
+    .status.info { color: #e5ebf8; }
+    .status.ok { color: var(--ok); border-color: rgba(146,242,186,0.25); background: rgba(146,242,186,0.09); }
+    .status.warn { color: var(--warn); border-color: rgba(255,213,141,0.25); background: rgba(255,213,141,0.10); }
+    .status.error { color: var(--danger); border-color: rgba(255,171,171,0.25); background: rgba(255,171,171,0.10); }
+
+    .stats { display: grid; gap: 12px; }
+    .stat {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(0,0,0,0.22);
+      padding: 16px;
+    }
+    .stat-title {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .stat-main {
+      font-size: 16px;
+      font-weight: 800;
+      line-height: 1.5;
+    }
+
+    .note {
+      border-radius: 18px;
+      border: 1px solid rgba(255,213,141,0.22);
+      background: rgba(255,213,141,0.09);
+      padding: 14px 16px;
+      color: #ffe5b8;
+      font-size: 13px;
+      line-height: 1.65;
+    }
+
+    .loading-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      background: linear-gradient(180deg, rgba(8,10,15,0.26), rgba(8,10,15,0.42));
+      backdrop-filter: blur(4px);
+      z-index: 7;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .18s ease;
+    }
+
+    .loading-overlay.show {
+      opacity: 1;
+    }
+
+    .loading-spinner {
+      width: 64px;
+      height: 64px;
+      border-radius: 999px;
+      border: 3px solid rgba(255,255,255,0.16);
+      border-top-color: rgba(255,255,255,0.98);
+      border-right-color: rgba(140,180,255,0.92);
+      animation: spin 0.9s linear infinite;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.28);
+    }
+
+    .loading-label {
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(18,20,27,0.78);
+      border: 1px solid rgba(255,255,255,0.10);
+      color: #f7f9ff;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      backdrop-filter: blur(10px);
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+
+    .hidden { display: none !important; }
+
+    @media (max-width: 980px) {
+      .layout { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 900px) {
+      .mobile-only { display: inline-flex; align-items: center; justify-content: center; }
+    }
+
+    @media (max-width: 640px) {
+      body { padding: 12px; }
+      .hero, .card { padding: 16px; }
+      .row { grid-template-columns: 1fr; }
+      .actions { flex-direction: column; }
+      .actions button { width: 100%; }
+      .compare-inner { min-height: 260px; }
+      .compare-handle { width: 52px; height: 52px; }
+      .dropzone { min-height: 230px; padding: 18px; }
+      .dropzone-inner { gap: 10px; }
+      .picker-btn, .mobile-viewer-btn, .viewer-close-btn { width: 100%; justify-content: center; }
+      .preview-top { align-items: stretch; }
+      .selected-file-card { grid-template-columns: 64px minmax(0, 1fr); }
+      .selected-file-card img { width: 64px; height: 64px; }
+      .mobile-viewer { padding: 10px; }
+      .mobile-viewer-top { align-items: stretch; flex-direction: column; }
+      .mobile-viewer-help { text-align: center; }
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
+</head>
+<body>
+  <div class="app">
+    <section class="hero">
+      <div class="chip">✨ Nano Banana 2 · modo fijo 1K barato · nunca 4K</div>
+      <h1>Restaura fotos antiguas y descarga un resultado grande sin meterte en costes de 4K</h1>
+      <p>
+        Esta versión usa <strong>gemini-3.1-flash-image-preview</strong> en modo fijo <strong>1K</strong>.
+        No devuelve la imagen al tamaño pequeño original: descarga el tamaño nativo más grande que devuelve la API dentro del modo barato,
+        manteniendo la proporción visual y evitando el salto al coste de 4K.
+      </p>
+    </section>
+
+    <div class="layout">
+      <section class="card">
+        <div id="emptyState" class="dropzone" tabindex="0">
+          <input id="fileInput" type="file" accept="image/*,.heic,.heif,.jpg,.jpeg,.png,.webp" class="native-file-input" />
+          <div class="dropzone-inner">
+            <div class="dropzone-icon">🖼️</div>
+            <h2>Arrastra aquí tu foto o pulsa para subirla</h2>
+            <p>
+              El comparador superpone ambas imágenes en la misma posición. No hace falta hacer clic: mueve el ratón o desliza con el dedo.
+            </p>
+            <label for="fileInput" class="picker-btn">Seleccionar foto</label>
+          </div>
+        </div>
+
+        <div id="previewSection" class="preview-wrap hidden">
+          <div class="preview-top">
+            <div>
+              <h2>Comparativa antes / después</h2>
+              <p>Mueve la barra sobre la foto. El resultado queda siempre superpuesto al original.</p>
+            </div>
+            <div class="chip">↔ comparador dinámico</div>
+            <button id="openMobileViewerBtn" class="mobile-viewer-btn mobile-only" type="button">Pantalla completa</button>
+          </div>
+
+          <div id="compareShell" class="compare-shell" style="--divider:50%; aspect-ratio: 1 / 1;">
+            <div class="compare-inner">
+              <img id="originalPreview" class="compare-img" alt="Antes" />
+              <img id="resultPreview" class="compare-img compare-after" alt="Después" />
+              <div id="loadingOverlay" class="loading-overlay hidden" aria-hidden="true">
+                <div class="loading-spinner"></div>
+                <div class="loading-label">Restaurando foto…</div>
+              </div>
+              <div class="badge left">después</div>
+              <div class="badge right">antes</div>
+              <div class="compare-divider">
+                <div class="compare-handle">↔</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="mobileViewer" class="mobile-viewer hidden" aria-hidden="true">
+          <div class="mobile-viewer-top">
+            <button id="closeMobileViewerBtn" class="viewer-close-btn" type="button">Cerrar comparador</button>
+            <div class="mobile-viewer-help">Desliza el dedo de izquierda a derecha para mover la barra sin que la página haga scroll.</div>
+          </div>
+          <div id="mobileCompareShell" class="mobile-compare-shell" style="--divider:50%; aspect-ratio: 1 / 1;">
+            <div class="compare-inner">
+              <img id="mobileOriginalPreview" class="compare-img" alt="Antes móvil" />
+              <img id="mobileResultPreview" class="compare-img compare-after" alt="Después móvil" />
+              <div id="mobileLoadingOverlay" class="loading-overlay hidden" aria-hidden="true">
+                <div class="loading-spinner"></div>
+                <div class="loading-label">Restaurando foto…</div>
+              </div>
+              <div class="badge left">después</div>
+              <div class="badge right">antes</div>
+              <div class="compare-divider">
+                <div class="compare-handle">↔</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+      <aside class="stack">
+        <section class="card stack">
+          <div class="field">
+            <label for="apiKey">API key de Gemini</label>
+            <input id="apiKey" type="text" value="PEGARAPIAQUI" autocomplete="off" spellcheck="false" />
+            <div class="subtle">Se guarda solo en este navegador usando <code>localStorage</code>.</div>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label for="model">Modelo</label>
+              <input id="model" type="text" value="gemini-3.1-flash-image-preview" readonly />
+            </div>
+            <div class="field">
+              <label for="mode">Modo de coste</label>
+              <input id="mode" type="text" value="1K fijo · barato · sin 4K" readonly />
+            </div>
+          </div>
+
+          <div id="selectedFileCard" class="selected-file-card hidden" aria-live="polite">
+            <img id="selectedFileThumb" alt="Vista previa de la foto seleccionada" />
+            <div class="selected-file-meta">
+              <div class="selected-file-title">Foto seleccionada</div>
+              <div id="selectedFileName" class="selected-file-name">Sin imagen</div>
+              <div id="selectedFileInfo" class="selected-file-info">Pulsa en “Seleccionar foto” para cargar una imagen.</div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="prompt">Prompt de restauración</label>
+            <textarea id="prompt" spellcheck="false">Restore this old photo while keeping a natural smartphone look, similar to a modern iPhone 16/17 selfie camera.
+
+Improve colour, lighting and overall clarity, but avoid excessive sharpening, skin texture or artificial detail reconstruction.
+
+Preserve the exact original facial features and proportions.
+Do not invent facial details that are not visible in the original photo.
+
+If parts of the face are blurry or low-detail, keep them soft and natural rather than generating new skin texture.
+
+Aim for a realistic mobile photo quality: natural skin, slight softness, balanced contrast, and gentle noise reduction.
+
+The result should look like a clean iPhone selfie taken today, not a hyper-detailed DSLR portrait.
+
+Keep the same framing, crop, face position, orientation, composition and aspect ratio as the input image.
+Return a single restored image only.</textarea>
+          </div>
+
+          <div class="actions">
+            <button id="processBtn" class="primary" disabled>Restaurar foto</button>
+            <button id="downloadBtn" class="secondary" disabled>Descargar resultado</button>
+            <button id="resetBtn" class="ghost">Reiniciar</button>
+          </div>
+
+          <div id="statusBox" class="status info">Listo.</div>
+        </section>
+
+        <section class="card">
+          <div class="stats">
+            <div class="stat">
+              <div class="stat-title">Original</div>
+              <div id="origStat" class="stat-main">Sin imagen</div>
+            </div>
+            <div class="stat">
+              <div class="stat-title">Modo API</div>
+              <div id="apiStat" class="stat-main">1K fijo · barato · nunca 4K</div>
+            </div>
+            <div class="stat">
+              <div class="stat-title">Resultado descargable</div>
+              <div id="resultStat" class="stat-main">Sin resultado</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="note">
+          La app intenta pedir a la API una proporción equivalente a la de tu foto. Si la proporción exacta no está disponible,
+          pide la más cercana y luego recorta el resultado localmente para que el archivo final conserve la relación exacta de la imagen original.
+        </section>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    const DEFAULT_PROMPT = `Restore this old photo while keeping a natural smartphone look, similar to a modern iPhone 16/17 selfie camera.
+
+Improve colour, lighting and overall clarity, but avoid excessive sharpening, skin texture or artificial detail reconstruction.
+
+Preserve the exact original facial features and proportions.
+Do not invent facial details that are not visible in the original photo.
+
+If parts of the face are blurry or low-detail, keep them soft and natural rather than generating new skin texture.
+
+Aim for a realistic mobile photo quality: natural skin, slight softness, balanced contrast, and gentle noise reduction.
+
+The result should look like a clean iPhone selfie taken today, not a hyper-detailed DSLR portrait.
+
+Keep the same framing, crop, face position, orientation, composition and aspect ratio as the input image.
+Return a single restored image only.`;
+
+    const GOOGLE_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image-preview:generateContent";
+    const API_IMAGE_SIZE = "1K";
+    const INPUT_UPLOAD_MAX_SIDE = 1800;
+    const JPEG_QUALITY = 0.92;
+    const SUPPORTED_RATIOS = [
+      { label: "1:8", value: 1/8 },
+      { label: "1:4", value: 1/4 },
+      { label: "2:3", value: 2/3 },
+      { label: "3:4", value: 3/4 },
+      { label: "4:5", value: 4/5 },
+      { label: "9:16", value: 9/16 },
+      { label: "1:1", value: 1 },
+      { label: "5:4", value: 5/4 },
+      { label: "4:3", value: 4/3 },
+      { label: "3:2", value: 3/2 },
+      { label: "16:9", value: 16/9 },
+      { label: "21:9", value: 21/9 },
+      { label: "4:1", value: 4 },
+      { label: "8:1", value: 8 }
+    ];
+
+    const fileInput = document.getElementById("fileInput");
+    const emptyState = document.getElementById("emptyState");
+    const previewSection = document.getElementById("previewSection");
+    const compareShell = document.getElementById("compareShell");
+    const mobileCompareShell = document.getElementById("mobileCompareShell");
+    const originalPreview = document.getElementById("originalPreview");
+    const resultPreview = document.getElementById("resultPreview");
+    const mobileOriginalPreview = document.getElementById("mobileOriginalPreview");
+    const mobileResultPreview = document.getElementById("mobileResultPreview");
+    const loadingOverlay = document.getElementById("loadingOverlay");
+    const mobileLoadingOverlay = document.getElementById("mobileLoadingOverlay");
+    const openMobileViewerBtn = document.getElementById("openMobileViewerBtn");
+    const closeMobileViewerBtn = document.getElementById("closeMobileViewerBtn");
+    const mobileViewer = document.getElementById("mobileViewer");
+    const apiKeyInput = document.getElementById("apiKey");
+    const promptInput = document.getElementById("prompt");
+    const selectedFileCard = document.getElementById("selectedFileCard");
+    const selectedFileThumb = document.getElementById("selectedFileThumb");
+    const selectedFileName = document.getElementById("selectedFileName");
+    const selectedFileInfo = document.getElementById("selectedFileInfo");
+    const processBtn = document.getElementById("processBtn");
+    const downloadBtn = document.getElementById("downloadBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const statusBox = document.getElementById("statusBox");
+    const origStat = document.getElementById("origStat");
+    const apiStat = document.getElementById("apiStat");
+    const resultStat = document.getElementById("resultStat");
+
+    const state = {
+      file: null,
+      originalName: "foto",
+      originalDataUrl: "",
+      originalWidth: 0,
+      originalHeight: 0,
+      originalMime: "image/jpeg",
+      originalRatio: 1,
+      apiAspectRatio: "1:1",
+      uploadBase64: "",
+      uploadMime: "image/jpeg",
+      uploadWidth: 0,
+      uploadHeight: 0,
+      resultDataUrl: "",
+      resultMime: "image/png",
+      resultWidth: 0,
+      resultHeight: 0,
+      divider: 50,
+      isDraggingCompare: false,
+      isProcessing: false,
+    };
+
+    init();
+
+    function init() {
+      const savedKey = localStorage.getItem("gemini_api_key_local_html");
+      const savedPrompt = localStorage.getItem("gemini_restore_prompt_local_html_v2");
+      if (savedKey && savedKey.trim()) apiKeyInput.value = savedKey;
+      promptInput.value = (savedPrompt && savedPrompt.trim()) ? savedPrompt : DEFAULT_PROMPT;
+      if (!promptInput.value.trim()) promptInput.value = DEFAULT_PROMPT;
+      wireEvents();
+      updateButtons();
+      setStatus("Sube una imagen y pega tu API key para empezar.", "info");
+    }
+
+    function wireEvents() {
+      emptyState.addEventListener("click", () => fileInput.click());
+      emptyState.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          fileInput.click();
+        }
+      });
+
+      fileInput.addEventListener("change", async (e) => {
+        const file = e.target.files?.[0];
+        if (file) await handleFile(file);
+      });
+
+      ["dragenter", "dragover"].forEach((evt) => {
+        emptyState.addEventListener(evt, (e) => {
+          e.preventDefault();
+          emptyState.classList.add("dragover");
+        });
+      });
+
+      ["dragleave", "drop"].forEach((evt) => {
+        emptyState.addEventListener(evt, (e) => {
+          e.preventDefault();
+          emptyState.classList.remove("dragover");
+        });
+      });
+
+      emptyState.addEventListener("drop", async (e) => {
+        const file = e.dataTransfer?.files?.[0];
+        if (file) await handleFile(file);
+      });
+
+      apiKeyInput.addEventListener("input", () => {
+        localStorage.setItem("gemini_api_key_local_html", apiKeyInput.value.trim());
+        updateButtons();
+      });
+
+      promptInput.addEventListener("input", () => {
+        localStorage.setItem("gemini_restore_prompt_local_html_v2", promptInput.value);
+      });
+
+      window.addEventListener("pageshow", () => {
+        if (!promptInput.value.trim()) {
+          promptInput.value = DEFAULT_PROMPT;
+          localStorage.setItem("gemini_restore_prompt_local_html_v2", DEFAULT_PROMPT);
+        }
+      });
+
+      requestAnimationFrame(() => {
+        if (!promptInput.value.trim()) {
+          promptInput.value = DEFAULT_PROMPT;
+        }
+      });
+
+      processBtn.addEventListener("click", restorePhoto);
+      downloadBtn.addEventListener("click", downloadResult);
+      resetBtn.addEventListener("click", resetAll);
+
+      openMobileViewerBtn?.addEventListener("click", openMobileViewer);
+      closeMobileViewerBtn?.addEventListener("click", closeMobileViewer);
+      mobileViewer?.addEventListener("click", (e) => {
+        if (e.target === mobileViewer) closeMobileViewer();
+      });
+
+      bindCompareInteractions(compareShell);
+      bindCompareInteractions(mobileCompareShell);
+    }
+
+    function updateButtons() {
+      const hasKey = !!apiKeyInput.value.trim();
+      const hasFile = !!state.file;
+      processBtn.disabled = !(hasKey && hasFile) || state.isProcessing;
+      downloadBtn.disabled = !state.resultDataUrl || state.isProcessing;
+    }
+
+    function setStatus(message, type = "info") {
+      statusBox.textContent = message;
+      statusBox.className = `status ${type}`;
+    }
+
+    function setLoadingOverlay(show, label = "Restaurando foto…") {
+      [loadingOverlay, mobileLoadingOverlay].forEach((overlay) => {
+        if (!overlay) return;
+        const text = overlay.querySelector(".loading-label");
+        if (text) text.textContent = label;
+        overlay.classList.toggle("hidden", !show);
+        overlay.classList.toggle("show", !!show);
+        overlay.setAttribute("aria-hidden", show ? "false" : "true");
+      });
+    }
+
+    function updateDivider(percent) {
+      const clamped = Math.max(0, Math.min(100, percent));
+      state.divider = clamped;
+      compareShell?.style.setProperty("--divider", `${clamped}%`);
+      mobileCompareShell?.style.setProperty("--divider", `${clamped}%`);
+    }
+
+    function updateDividerFromPointer(shell, clientX) {
+      if (!shell) return;
+      const rect = shell.getBoundingClientRect();
+      const x = clientX - rect.left;
+      updateDivider((x / rect.width) * 100);
+    }
+
+    function bindCompareInteractions(shell) {
+      if (!shell) return;
+      shell.addEventListener("pointerdown", (e) => {
+        state.isDraggingCompare = true;
+        shell.setPointerCapture?.(e.pointerId);
+        updateDividerFromPointer(shell, e.clientX);
+        e.preventDefault();
+      });
+
+      shell.addEventListener("pointermove", (e) => {
+        if (e.pointerType === "mouse" || state.isDraggingCompare) {
+          updateDividerFromPointer(shell, e.clientX);
+        }
+        if (state.isDraggingCompare) e.preventDefault();
+      });
+
+      const stopDrag = () => {
+        state.isDraggingCompare = false;
+      };
+
+      shell.addEventListener("pointerup", stopDrag);
+      shell.addEventListener("pointercancel", stopDrag);
+      shell.addEventListener("pointerleave", () => {
+        if (!state.isDraggingCompare) return;
+      });
+    }
+
+    function openMobileViewer() {
+      if (!mobileViewer) return;
+      mobileViewer.classList.remove("hidden");
+      mobileViewer.setAttribute("aria-hidden", "false");
+      document.body.classList.add("no-scroll");
+      updateDivider(state.divider || 50);
+    }
+
+    function closeMobileViewer() {
+      if (!mobileViewer) return;
+      mobileViewer.classList.add("hidden");
+      mobileViewer.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("no-scroll");
+    }
+
+    async function handleFile(file) {
+      try {
+        if (!looksLikeImageFile(file)) {
+          throw new Error("El archivo no parece una imagen válida. Prueba con JPG, PNG, WEBP o HEIC.");
+        }
+
+        resetResultOnly();
+        state.file = file;
+        state.originalName = getBaseName(file.name || "foto");
+        state.originalMime = normalizeOutputMime(file.type || guessMimeFromFilename(file.name));
+
+        if (selectedFileCard) selectedFileCard.classList.remove("hidden");
+        if (selectedFileThumb) selectedFileThumb.removeAttribute("src");
+        if (selectedFileName) selectedFileName.textContent = file.name || `${state.originalName}.${(state.originalMime.split("/")[1] || "jpg")}`;
+        if (selectedFileInfo) selectedFileInfo.textContent = "Procesando vista previa…";
+        setStatus("Foto seleccionada. Preparando vista previa…", "info");
+        updateButtons();
+
+        const usable = await getUsableImageFromFile(file);
+        const img = await loadImage(usable.dataUrl);
+
+        state.originalDataUrl = usable.dataUrl;
+        state.originalWidth = img.naturalWidth || img.width;
+        state.originalHeight = img.naturalHeight || img.height;
+        state.originalRatio = state.originalWidth / state.originalHeight;
+        state.apiAspectRatio = getNearestAspectRatio(state.originalWidth, state.originalHeight).label;
+        state.originalMime = normalizeOutputMime(usable.mimeType || state.originalMime);
+
+        const prepared = prepareImageForUpload(img, state.originalMime, INPUT_UPLOAD_MAX_SIDE);
+        state.uploadBase64 = prepared.base64;
+        state.uploadMime = prepared.mimeType;
+        state.uploadWidth = prepared.width;
+        state.uploadHeight = prepared.height;
+
+        originalPreview.src = state.originalDataUrl;
+        mobileOriginalPreview.src = state.originalDataUrl;
+        resultPreview.src = state.originalDataUrl;
+        mobileResultPreview.src = state.originalDataUrl;
+        resultPreview.classList.add("compare-pending");
+        mobileResultPreview.classList.add("compare-pending");
+        if (selectedFileThumb) selectedFileThumb.src = state.originalDataUrl;
+        if (selectedFileInfo) {
+          const extra = usable.wasConverted ? " · HEIC convertido a JPG para que funcione bien en móvil" : "";
+          selectedFileInfo.innerHTML = `${state.originalWidth} × ${state.originalHeight}px · ${formatMime(state.originalMime)} · relación ${ratioText(state.originalWidth, state.originalHeight)}${extra}`;
+        }
+        setLoadingOverlay(false);
+        compareShell.style.aspectRatio = `${state.originalWidth} / ${state.originalHeight}`;
+        mobileCompareShell.style.aspectRatio = `${state.originalWidth} / ${state.originalHeight}`;
+        updateDivider(50);
+        previewSection.classList.remove("hidden");
+        emptyState.classList.add("hidden");
+
+        origStat.innerHTML = `${state.originalWidth} × ${state.originalHeight}px<br>${formatMime(state.originalMime)} · relación ${ratioText(state.originalWidth, state.originalHeight)}`;
+        apiStat.innerHTML = `Salida API: ${API_IMAGE_SIZE}<br>Proporción pedida: ${state.apiAspectRatio} · nunca 4K`;
+        resultStat.textContent = "Sin resultado todavía";
+
+        setStatus(usable.wasConverted
+          ? "Imagen lista. Tu móvil la dio en HEIC y la app la convirtió a JPG automáticamente para que funcione bien."
+          : "Imagen lista. Esta versión usará Nano Banana 2 en modo 1K barato.", "ok");
+        updateButtons();
+      } catch (error) {
+        console.error(error);
+        state.uploadBase64 = "";
+        state.uploadMime = "image/jpeg";
+        updateButtons();
+        const msg = error && error.message ? error.message : "No se pudo cargar la imagen.";
+        setStatus(msg, "error");
+        if (selectedFileCard) selectedFileCard.classList.remove("hidden");
+        if (selectedFileInfo) selectedFileInfo.textContent = msg;
+      }
+    }
+
+    async function restorePhoto() {
+      const apiKey = apiKeyInput.value.trim();
+      if (!apiKey || apiKey === "PEGARAPIAQUI") {
+        setStatus("Pega tu API key real en el campo de arriba.", "warn");
+        return;
+      }
+      if (!state.file || !state.uploadBase64) {
+        setStatus("Primero sube una imagen.", "warn");
+        return;
+      }
+
+      state.isProcessing = true;
+      updateButtons();
+      setLoadingOverlay(true, "Restaurando foto…");
+      setStatus(`Enviando imagen a Nano Banana 2 en modo ${API_IMAGE_SIZE}…`, "info");
+
+      try {
+        let prompt = (promptInput.value || DEFAULT_PROMPT).trim();
+        if (!prompt) {
+          prompt = DEFAULT_PROMPT;
+          promptInput.value = DEFAULT_PROMPT;
+          localStorage.setItem("gemini_restore_prompt_local_html_v2", DEFAULT_PROMPT);
+        }
+        const apiResponse = await callGeminiImageEdit({
+          apiKey,
+          prompt,
+          base64Image: state.uploadBase64,
+          mimeType: state.uploadMime,
+          aspectRatio: state.apiAspectRatio,
+          imageSize: API_IMAGE_SIZE,
+        });
+
+        const outputPart = findImagePart(apiResponse);
+        if (!outputPart) {
+          const maybeText = findTextPart(apiResponse);
+          throw new Error(maybeText || "La API respondió, pero no devolvió ninguna imagen.");
+        }
+
+        const returnedMime = outputPart.inline_data?.mime_type || outputPart.inlineData?.mimeType || "image/png";
+        const returnedBase64 = outputPart.inline_data?.data || outputPart.inlineData?.data;
+        const returnedDataUrl = `data:${returnedMime};base64,${returnedBase64}`;
+
+        const finalResult = await cropResultToExactOriginalRatio(
+          returnedDataUrl,
+          state.originalRatio,
+          normalizeCanvasMime(returnedMime)
+        );
+
+        state.resultDataUrl = finalResult.dataUrl;
+        state.resultMime = finalResult.mimeType;
+        state.resultWidth = finalResult.width;
+        state.resultHeight = finalResult.height;
+
+        resultPreview.src = state.resultDataUrl;
+        mobileResultPreview.src = state.resultDataUrl;
+        resultPreview.classList.remove("compare-pending");
+        mobileResultPreview.classList.remove("compare-pending");
+        resultStat.innerHTML = `${state.resultWidth} × ${state.resultHeight}px<br>${formatMime(state.resultMime)} · nativo en modo 1K, sin volver al tamaño original pequeño`;
+        setStatus("Foto restaurada. Se ha descargado al tamaño nativo devuelto por la API dentro del modo barato.", "ok");
+      } catch (error) {
+        console.error(error);
+        setStatus(error.message || "Error al procesar la imagen con Gemini.", "error");
+      } finally {
+        state.isProcessing = false;
+        setLoadingOverlay(false);
+        updateButtons();
+      }
+    }
+
+    async function callGeminiImageEdit({ apiKey, prompt, base64Image, mimeType, aspectRatio, imageSize }) {
+      const payload = {
+        contents: [{
+          parts: [
+            {
+              inline_data: {
+                mime_type: mimeType,
+                data: base64Image,
+              }
+            },
+            { text: prompt }
+          ]
+        }],
+        generationConfig: {
+          responseModalities: ["IMAGE"],
+          imageConfig: {
+            aspectRatio,
+            imageSize,
+          }
+        }
+      };
+
+      const response = await fetch(GOOGLE_API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-goog-api-key": apiKey,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        const message = data?.error?.message || `Error HTTP ${response.status}`;
+        throw new Error(message);
+      }
+      if (data?.promptFeedback?.blockReason) {
+        throw new Error(`La petición fue bloqueada: ${data.promptFeedback.blockReason}`);
+      }
+      return data;
+    }
+
+    function findImagePart(response) {
+      const parts = response?.candidates?.[0]?.content?.parts || [];
+      return parts.find((part) => part.inline_data?.data || part.inlineData?.data) || null;
+    }
+
+    function findTextPart(response) {
+      const parts = response?.candidates?.[0]?.content?.parts || [];
+      const textPart = parts.find((part) => typeof part.text === "string" && part.text.trim());
+      return textPart ? textPart.text.trim() : "";
+    }
+
+    function prepareImageForUpload(image, originalMime, maxSide = 1800) {
+      const fitted = fitWithin(image.naturalWidth || image.width, image.naturalHeight || image.height, maxSide);
+      const canvas = document.createElement("canvas");
+      canvas.width = fitted.width;
+      canvas.height = fitted.height;
+      const ctx = canvas.getContext("2d");
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = "high";
+      ctx.drawImage(image, 0, 0, fitted.width, fitted.height);
+      const mimeType = normalizeCanvasMime(originalMime);
+      const dataUrl = canvas.toDataURL(mimeType, JPEG_QUALITY);
+      return {
+        base64: dataUrl.split(",")[1],
+        mimeType,
+        width: fitted.width,
+        height: fitted.height,
+      };
+    }
+
+    async function cropResultToExactOriginalRatio(inputDataUrl, targetRatio, outputMime) {
+      const image = await loadImage(inputDataUrl);
+      const sourceWidth = image.naturalWidth || image.width;
+      const sourceHeight = image.naturalHeight || image.height;
+      const sourceRatio = sourceWidth / sourceHeight;
+
+      let sx = 0;
+      let sy = 0;
+      let sw = sourceWidth;
+      let sh = sourceHeight;
+
+      if (Math.abs(sourceRatio - targetRatio) > 0.0001) {
+        if (sourceRatio > targetRatio) {
+          sw = Math.max(1, Math.round(sourceHeight * targetRatio));
+          sx = Math.round((sourceWidth - sw) / 2);
+        } else {
+          sh = Math.max(1, Math.round(sourceWidth / targetRatio));
+          sy = Math.round((sourceHeight - sh) / 2);
+        }
+      }
+
+      const canvas = document.createElement("canvas");
+      canvas.width = sw;
+      canvas.height = sh;
+      const ctx = canvas.getContext("2d");
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = "high";
+      ctx.drawImage(image, sx, sy, sw, sh, 0, 0, sw, sh);
+      const mimeType = normalizeCanvasMime(outputMime);
+      const dataUrl = canvas.toDataURL(mimeType, JPEG_QUALITY);
+      return {
+        dataUrl,
+        mimeType,
+        width: sw,
+        height: sh,
+      };
+    }
+
+    function getNearestAspectRatio(width, height) {
+      const target = width / height;
+      let best = SUPPORTED_RATIOS[0];
+      let bestDiff = Infinity;
+      for (const ratio of SUPPORTED_RATIOS) {
+        const diff = Math.abs(Math.log(target / ratio.value));
+        if (diff < bestDiff) {
+          best = ratio;
+          bestDiff = diff;
+        }
+      }
+      return best;
+    }
+
+    function fitWithin(width, height, maxSide) {
+      if (Math.max(width, height) <= maxSide) return { width, height };
+      if (width >= height) {
+        return {
+          width: maxSide,
+          height: Math.max(1, Math.round((height / width) * maxSide)),
+        };
+      }
+      return {
+        width: Math.max(1, Math.round((width / height) * maxSide)),
+        height: maxSide,
+      };
+    }
+
+    function normalizeCanvasMime(mime) {
+      const safe = normalizeOutputMime(mime);
+      if (safe === "image/webp") return "image/webp";
+      if (safe === "image/png") return "image/png";
+      return "image/jpeg";
+    }
+
+    function normalizeOutputMime(mime) {
+      const lower = String(mime || "").toLowerCase();
+      if (lower.includes("png")) return "image/png";
+      if (lower.includes("webp")) return "image/webp";
+      return "image/jpeg";
+    }
+
+    function formatMime(mime) {
+      if (mime === "image/png") return "PNG";
+      if (mime === "image/webp") return "WEBP";
+      return "JPG";
+    }
+
+    function ratioText(w, h) {
+      const divisor = gcd(w, h);
+      return `${Math.round(w / divisor)}:${Math.round(h / divisor)}`;
+    }
+
+    function gcd(a, b) {
+      return b === 0 ? a : gcd(b, a % b);
+    }
+
+    function getBaseName(filename) {
+      return String(filename || "foto").replace(/\.[^/.]+$/, "") || "foto";
+    }
+
+    function getFileExtension(filename) {
+      const name = String(filename || "").toLowerCase();
+      const match = name.match(/\.([a-z0-9]+)$/i);
+      return match ? match[1] : "";
+    }
+
+    function guessMimeFromFilename(filename) {
+      const ext = getFileExtension(filename);
+      if (ext === "png") return "image/png";
+      if (ext === "webp") return "image/webp";
+      if (ext === "heic" || ext === "heif") return "image/heic";
+      return "image/jpeg";
+    }
+
+    function looksLikeImageFile(file) {
+      const type = String(file?.type || "").toLowerCase();
+      if (type.startsWith("image/")) return true;
+      const ext = getFileExtension(file?.name || "");
+      return ["jpg", "jpeg", "png", "webp", "heic", "heif"].includes(ext);
+    }
+
+    function isHeicLike(file) {
+      const type = String(file?.type || "").toLowerCase();
+      const ext = getFileExtension(file?.name || "");
+      return type.includes("heic") || type.includes("heif") || ext === "heic" || ext === "heif";
+    }
+
+    async function getUsableImageFromFile(file) {
+      if (isHeicLike(file)) {
+        return await convertHeicFileToJpeg(file);
+      }
+      const dataUrl = await fileToDataURL(file);
+      return {
+        dataUrl,
+        mimeType: normalizeOutputMime(file.type || guessMimeFromFilename(file.name)),
+        wasConverted: false,
+      };
+    }
+
+    async function convertHeicFileToJpeg(file) {
+      if (typeof window.heic2any !== "function") {
+        throw new Error("Tu foto parece HEIC/HEIF y esta versión no pudo cargar el conversor. Abre el HTML con internet o exporta la foto como JPG.");
+      }
+      let output = await window.heic2any({
+        blob: file,
+        toType: "image/jpeg",
+        quality: 0.95,
+      });
+      if (Array.isArray(output)) output = output[0];
+      const convertedFile = new File([output], `${getBaseName(file.name || "foto")}.jpg`, { type: "image/jpeg" });
+      const dataUrl = await fileToDataURL(convertedFile);
+      return {
+        dataUrl,
+        mimeType: "image/jpeg",
+        wasConverted: true,
+      };
+    }
+
+    function fileToDataURL(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(new Error("No se pudo leer el archivo."));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function loadImage(src) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = () => reject(new Error("No se pudo cargar la imagen."));
+        img.src = src;
+      });
+    }
+
+    function downloadResult() {
+      if (!state.resultDataUrl) return;
+      const a = document.createElement("a");
+      a.href = state.resultDataUrl;
+      const ext = state.resultMime === "image/png" ? "png" : state.resultMime === "image/webp" ? "webp" : "jpg";
+      a.download = `${state.originalName || "foto"}-restaurada-nb2-1k.${ext}`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    }
+
+    function resetResultOnly() {
+      state.resultDataUrl = "";
+      state.resultMime = "image/png";
+      state.resultWidth = 0;
+      state.resultHeight = 0;
+      if (state.originalDataUrl) {
+        resultPreview.src = state.originalDataUrl;
+        mobileResultPreview.src = state.originalDataUrl;
+        resultPreview.classList.add("compare-pending");
+        mobileResultPreview.classList.add("compare-pending");
+      } else {
+        resultPreview.src = "";
+        mobileResultPreview.src = "";
+      }
+      resultStat.textContent = "Sin resultado todavía";
+      setLoadingOverlay(false);
+      updateButtons();
+    }
+
+    function resetAll() {
+      state.file = null;
+      state.originalName = "foto";
+      state.originalDataUrl = "";
+      state.originalWidth = 0;
+      state.originalHeight = 0;
+      state.originalMime = "image/jpeg";
+      state.originalRatio = 1;
+      state.apiAspectRatio = "1:1";
+      state.uploadBase64 = "";
+      state.uploadMime = "image/jpeg";
+      state.uploadWidth = 0;
+      state.uploadHeight = 0;
+      state.resultDataUrl = "";
+      state.resultMime = "image/png";
+      state.resultWidth = 0;
+      state.resultHeight = 0;
+      state.isProcessing = false;
+
+      fileInput.value = "";
+      if (selectedFileCard) selectedFileCard.classList.add("hidden");
+      if (selectedFileThumb) selectedFileThumb.src = "";
+      if (selectedFileName) selectedFileName.textContent = "Sin imagen";
+      if (selectedFileInfo) selectedFileInfo.textContent = "Pulsa en “Seleccionar foto” para cargar una imagen.";
+      originalPreview.src = "";
+      if (state.originalDataUrl) {
+        resultPreview.src = state.originalDataUrl;
+        mobileResultPreview.src = state.originalDataUrl;
+        resultPreview.classList.add("compare-pending");
+        mobileResultPreview.classList.add("compare-pending");
+      } else {
+        resultPreview.src = "";
+        mobileResultPreview.src = "";
+      }
+      emptyState.classList.remove("hidden");
+      previewSection.classList.add("hidden");
+      compareShell.style.aspectRatio = "1 / 1";
+      mobileCompareShell.style.aspectRatio = "1 / 1";
+      setLoadingOverlay(false);
+      updateDivider(50);
+      origStat.textContent = "Sin imagen";
+      apiStat.innerHTML = "1K fijo · barato · nunca 4K";
+      resultStat.textContent = "Sin resultado";
+      setStatus("Todo reiniciado. Sube otra imagen cuando quieras.", "info");
+      updateButtons();
+    }
+  </script>
+</body>
+</html>
